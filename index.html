@@ -7,7 +7,7 @@
   <h1>📚 Bibliothèque de la Sorcière Tsuyu</h1>
 
   <input type="text" id="search" placeholder="Rechercher un livre..." />
-  <button onclick="searchBooks()">🔍 Chercher</button>
+  <button id="searchBtn">🔍 Chercher</button>
 
   <h2>🔎 Résultats</h2>
   <div id="results"></div>
@@ -18,18 +18,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-    // ✅ Connexion Supabase
-    const supabase = supabase.createClient(
+    const supabaseClient = supabase.createClient(
       "https://kmdkhpaxqnmyuapicycq.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZGtocGF4cW5teXVhcGljeWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTQxODAsImV4cCI6MjA5MzEzMDE4MH0.GmWZFV7mqBAteOsxSNLQ8I6YTIG_uvg7lOkq7Ws_fLg"
     );
 
-    // 🔍 Recherche de livres via Google Books
+    // 🔍 Recherche
     async function searchBooks() {
       const query = document.getElementById("search").value;
 
+      if (!query) return;
+
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${query}`
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`
       );
 
       const data = await res.json();
@@ -47,20 +48,22 @@
 
         const div = document.createElement("div");
 
+        const button = document.createElement("button");
+        button.textContent = "➕ Ajouter";
+        button.onclick = () => addBook(info);
+
         div.innerHTML = `
-          <p>
-            <strong>${info.title}</strong> - ${info.authors?.[0] || "?"}
-            <button onclick='addBook(${JSON.stringify(info)})'>➕ Ajouter</button>
-          </p>
+          <p><strong>${info.title}</strong> - ${info.authors?.[0] || "?"}</p>
         `;
 
+        div.appendChild(button);
         resultsDiv.appendChild(div);
       });
     }
 
-    // ➕ Ajouter un livre dans Supabase
+    // ➕ Ajouter livre
     async function addBook(info) {
-      const { error } = await supabase.from("books").insert([
+      const { error } = await supabaseClient.from("books").insert([
         {
           title: info.title,
           author: info.authors?.[0] || "Inconnu",
@@ -69,17 +72,16 @@
       ]);
 
       if (error) {
-        alert("Erreur 😢");
         console.error(error);
+        alert("Erreur 😢");
       } else {
-        alert("Livre ajouté ✨");
         loadLibrary();
       }
     }
 
-    // 📚 Charger la bibliothèque depuis Supabase
+    // 📚 Charger bibliothèque
     async function loadLibrary() {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from("books")
         .select("*")
         .order("created_at", { ascending: false });
@@ -87,31 +89,19 @@
       const libraryDiv = document.getElementById("library");
       libraryDiv.innerHTML = "";
 
-      if (error) {
-        console.error(error);
-        libraryDiv.innerHTML = "<p>Erreur de chargement 😢</p>";
-        return;
-      }
-
-      if (data.length === 0) {
-        libraryDiv.innerHTML = "<p>Aucun livre pour l'instant</p>";
-        return;
-      }
+      if (!data) return;
 
       data.forEach(book => {
         const div = document.createElement("div");
-
-        div.innerHTML = `
-          <p>
-            <strong>${book.title}</strong> - ${book.author}
-          </p>
-        `;
-
+        div.innerHTML = `<p><strong>${book.title}</strong> - ${book.author}</p>`;
         libraryDiv.appendChild(div);
       });
     }
 
-    // 🚀 Charger au démarrage
+    // 👉 LIAISON DU BOUTON (solution fiable)
+    document.getElementById("searchBtn").addEventListener("click", searchBooks);
+
+    // 🚀 démarrage
     loadLibrary();
   </script>
 </body>
