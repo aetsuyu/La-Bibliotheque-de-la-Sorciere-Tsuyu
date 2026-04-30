@@ -9,16 +9,22 @@
   <input type="text" id="search" placeholder="Rechercher un livre..." />
   <button onclick="searchBooks()">🔍 Chercher</button>
 
+  <h2>🔎 Résultats</h2>
   <div id="results"></div>
+
+  <h2>📚 Ma bibliothèque</h2>
+  <div id="library"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
+    // ✅ Connexion Supabase
     const supabase = supabase.createClient(
-      "TON_URL",
-      "TA_CLE"
+      "https://kmdkhpaxqnmyuapicycq.supabase.co",
+      "TA_CLE_ANON_ICI"
     );
 
+    // 🔍 Recherche de livres via Google Books
     async function searchBooks() {
       const query = document.getElementById("search").value;
 
@@ -31,21 +37,30 @@
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
 
+      if (!data.items) {
+        resultsDiv.innerHTML = "<p>Aucun résultat 😢</p>";
+        return;
+      }
+
       data.items.forEach(book => {
         const info = book.volumeInfo;
 
         const div = document.createElement("div");
+
         div.innerHTML = `
-          <p><strong>${info.title}</strong> - ${info.authors?.[0] || "?"}</p>
-          <button onclick='addBook(${JSON.stringify(info)})'>Ajouter</button>
+          <p>
+            <strong>${info.title}</strong> - ${info.authors?.[0] || "?"}
+            <button onclick='addBook(${JSON.stringify(info)})'>➕ Ajouter</button>
+          </p>
         `;
 
         resultsDiv.appendChild(div);
       });
     }
 
+    // ➕ Ajouter un livre dans Supabase
     async function addBook(info) {
-      await supabase.from("books").insert([
+      const { error } = await supabase.from("books").insert([
         {
           title: info.title,
           author: info.authors?.[0] || "Inconnu",
@@ -53,8 +68,51 @@
         }
       ]);
 
-      alert("Livre ajouté à la bibliothèque ✨");
+      if (error) {
+        alert("Erreur 😢");
+        console.error(error);
+      } else {
+        alert("Livre ajouté ✨");
+        loadLibrary();
+      }
     }
+
+    // 📚 Charger la bibliothèque depuis Supabase
+    async function loadLibrary() {
+      const { data, error } = await supabase
+        .from("books")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      const libraryDiv = document.getElementById("library");
+      libraryDiv.innerHTML = "";
+
+      if (error) {
+        console.error(error);
+        libraryDiv.innerHTML = "<p>Erreur de chargement 😢</p>";
+        return;
+      }
+
+      if (data.length === 0) {
+        libraryDiv.innerHTML = "<p>Aucun livre pour l'instant</p>";
+        return;
+      }
+
+      data.forEach(book => {
+        const div = document.createElement("div");
+
+        div.innerHTML = `
+          <p>
+            <strong>${book.title}</strong> - ${book.author}
+          </p>
+        `;
+
+        libraryDiv.appendChild(div);
+      });
+    }
+
+    // 🚀 Charger au démarrage
+    loadLibrary();
   </script>
 </body>
 </html>
