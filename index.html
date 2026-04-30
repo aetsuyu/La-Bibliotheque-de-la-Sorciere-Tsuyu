@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bibliothèque de Tsuyu</title>
+</head>
+<body>
+  <h1>📚 Bibliothèque de la Sorcière Tsuyu</h1>
+
+  <input type="text" id="search" placeholder="Rechercher un livre..." />
+  <button onclick="searchBooks()">🔍 Chercher</button>
+
+  <div id="results"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const supabase = supabase.createClient(
+      "TON_URL",
+      "TA_CLE"
+    );
+
+    async function searchBooks() {
+      const query = document.getElementById("search").value;
+
+      const res = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=${query}`
+      );
+
+      const data = await res.json();
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      data.items.forEach(book => {
+        const info = book.volumeInfo;
+
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><strong>${info.title}</strong> - ${info.authors?.[0] || "?"}</p>
+          <button onclick='addBook(${JSON.stringify(info)})'>Ajouter</button>
+        `;
+
+        resultsDiv.appendChild(div);
+      });
+    }
+
+    async function addBook(info) {
+      await supabase.from("books").insert([
+        {
+          title: info.title,
+          author: info.authors?.[0] || "Inconnu",
+          cover_url: info.imageLinks?.thumbnail || ""
+        }
+      ]);
+
+      alert("Livre ajouté à la bibliothèque ✨");
+    }
+  </script>
+</body>
+</html>
