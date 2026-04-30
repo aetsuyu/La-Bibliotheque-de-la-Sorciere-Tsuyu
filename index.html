@@ -15,15 +15,17 @@
   <h2>📚 Ma bibliothèque</h2>
   <div id="library"></div>
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-    const supabaseClient = supabase.createClient(
+    // ✅ Connexion Supabase (corrigée)
+    const supabaseClient = window.supabase.createClient(
       "https://kmdkhpaxqnmyuapicycq.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZGtocGF4cW5teXVhcGljeWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTQxODAsImV4cCI6MjA5MzEzMDE4MH0.GmWZFV7mqBAteOsxSNLQ8I6YTIG_uvg7lOkq7Ws_fLg"
     );
 
-    // 🔍 Recherche
+    // 🔍 Recherche livres
     async function searchBooks() {
       const query = document.getElementById("search").value;
 
@@ -98,10 +100,10 @@
       });
     }
 
-    // 👉 LIAISON DU BOUTON (solution fiable)
+    // ✅ bouton recherche (corrigé)
     document.getElementById("searchBtn").addEventListener("click", searchBooks);
 
-    // 🚀 démarrage
+    // 🚀 chargement initial
     loadLibrary();
   </script>
 </body>
