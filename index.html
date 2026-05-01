@@ -3,13 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>Bibliothèque de Tsuyu</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #searchBar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #results, #library {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .book {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      background: #f9f9f9;
+    }
+
+    .book img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
   <h1>📚 Bibliothèque de la Sorcière Tsuyu</h1>
 
-  <input type="text" id="search" placeholder="Rechercher un livre..." />
-  <button id="searchBtn">🔍 Chercher</button>
+  <div id="searchBar">
+    <input type="text" id="search" placeholder="Rechercher un livre..." />
+    <button id="searchBtn">🔍 Chercher</button>
+  </div>
 
   <h2>🔎 Résultats</h2>
   <div id="results"></div>
@@ -21,19 +63,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
-    // 🔗 Connexion Supabase
     const supabaseClient = window.supabase.createClient(
       "https://kmdkhpaxqnmyuapicycq.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZGtocGF4cW5teXVhcGljeWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTQxODAsImV4cCI6MjA5MzEzMDE4MH0.GmWZFV7mqBAteOsxSNLQ8I6YTIG_uvg7lOkq7Ws_fLg"
     );
 
-    // 🔍 Recherche OpenLibrary
+    // 🔍 Recherche améliorée
     async function searchBooks() {
       const query = document.getElementById("search").value;
       if (!query) return;
 
       const res = await fetch(
-        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
+        `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}`
       );
 
       const data = await res.json();
@@ -46,37 +87,44 @@
         return;
       }
 
-      data.docs.slice(0, 10).forEach(book => {
-        const info = {
-          title: book.title,
-          author: book.author_name?.[0] || "Inconnu",
-          cover: book.cover_i
-            ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-            : ""
-        };
+      data.docs
+        .filter(book => 
+          book.title &&
+          book.author_name &&
+          book.first_publish_year &&
+          !book.title.toLowerCase().includes("disney") &&
+          !book.title.toLowerCase().includes("carrousel")
+        )
+        .slice(0, 12)
+        .forEach(book => {
 
-        const div = document.createElement("div");
+          const info = {
+            title: book.title,
+            author: book.author_name[0],
+            cover: book.cover_i
+              ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+              : ""
+          };
 
-        const button = document.createElement("button");
-        button.textContent = "➕ Ajouter";
-        button.onclick = () => addBook(info);
+          const div = document.createElement("div");
+          div.className = "book";
 
-        div.innerHTML = `
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-            ${info.cover ? `<img src="${info.cover}" width="60">` : ""}
-            <div>
-              <strong>${info.title}</strong><br>
-              ${info.author}
-            </div>
-          </div>
-        `;
+          div.innerHTML = `
+            ${info.cover ? `<img src="${info.cover}">` : ""}
+            <div><strong>${info.title}</strong></div>
+            <div>${info.author}</div>
+          `;
 
-        div.appendChild(button);
-        resultsDiv.appendChild(div);
-      });
+          const button = document.createElement("button");
+          button.textContent = "➕ Ajouter";
+          button.onclick = () => addBook(info);
+
+          div.appendChild(button);
+          resultsDiv.appendChild(div);
+        });
     }
 
-    // ➕ Ajouter un livre
+    // ➕ Ajouter livre
     async function addBook(info) {
       const { error } = await supabaseClient.from("books").insert([
         {
@@ -94,9 +142,9 @@
       }
     }
 
-    // 📚 Charger la bibliothèque
+    // 📚 Charger bibliothèque
     async function loadLibrary() {
-      const { data, error } = await supabaseClient
+      const { data } = await supabaseClient
         .from("books")
         .select("*");
 
@@ -110,25 +158,20 @@
 
       data.forEach(book => {
         const div = document.createElement("div");
+        div.className = "book";
 
         div.innerHTML = `
-          <div style="display:flex; gap:10px; margin-bottom:10px;">
-            ${book.cover_url ? `<img src="${book.cover_url}" width="60">` : ""}
-            <div>
-              <strong>${book.title}</strong><br>
-              ${book.author}
-            </div>
-          </div>
+          ${book.cover_url ? `<img src="${book.cover_url}">` : ""}
+          <div><strong>${book.title}</strong></div>
+          <div>${book.author}</div>
         `;
 
         libraryDiv.appendChild(div);
       });
     }
 
-    // 🔘 Bouton recherche
     document.getElementById("searchBtn").addEventListener("click", searchBooks);
 
-    // 🚀 Chargement initial
     loadLibrary();
   </script>
 </body>
