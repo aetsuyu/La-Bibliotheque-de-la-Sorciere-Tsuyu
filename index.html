@@ -32,7 +32,7 @@
       if (!query) return;
 
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=AIzaSyBPLFKmvWQ4w4mM7TBm0c8D7m6xh7gcH3U`
       );
 
       const data = await res.json();
