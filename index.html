@@ -19,6 +19,136 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <script>
+    // 🔗 Connexion Supabase
+    const supabaseClient = window.supabase.createClient(
+      "https://kmdkhpaxqnmyuapicycq.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZGtocGF4cW5teXVhcGljeWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NTQxODAsImV4cCI6MjA5MzEzMDE4MH0.GmWZFV7mqBAteOsxSNLQ8I6YTIG_uvg7lOkq7Ws_fLg"
+    );
+
+    // 🔍 Recherche avec OpenLibrary
+    async function searchBooks() {
+      const query = document.getElementById("search").value;
+
+      if (!query) return;
+
+      const res = await fetch(
+        `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}`
+      );
+
+      const data = await res.json();
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (!data.docs || data.docs.length === 0) {
+        resultsDiv.innerHTML = "<p>Aucun résultat 😢</p>";
+        return;
+      }
+
+      data.docs.slice(0, 10).forEach(book => {
+        const info = {
+          title: book.title,
+          authors: [book.author_name?.[0] || "Inconnu"],
+          imageLinks: {
+            thumbnail: book.cover_i
+              ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+              : ""
+          }
+        };
+
+        const div = document.createElement("div");
+
+        const button = document.createElement("button");
+        button.textContent = "➕ Ajouter";
+        button.onclick = () => addBook(info);
+
+        div.innerHTML = `
+          <p>
+            <strong>${info.title}</strong> - ${info.authors[0]}
+          </p>
+          ${info.imageLinks.thumbnail ? `<img src="${info.imageLinks.thumbnail}" width="80">` : ""}
+        `;
+
+        div.appendChild(button);
+        resultsDiv.appendChild(div);
+      });
+    }
+
+    // ➕ Ajouter livre dans Supabase
+    async function addBook(info) {
+      const { error } = await supabaseClient.from("books").insert([
+        {
+          title: info.title,
+          author: info.authors[0],
+          cover_url: info.imageLinks.thumbnail || ""
+        }
+      ]);
+
+      if (error) {
+        console.error(error);
+        alert("Erreur 😢");
+      } else {
+        loadLibrary();
+      }
+    }
+
+    // 📚 Charger bibliothèque
+    async function loadLibrary() {
+      const { data, error } = await supabaseClient
+        .from("books")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      const libraryDiv = document.getElementById("library");
+      libraryDiv.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        libraryDiv.innerHTML = "<p>Aucun livre pour l'instant</p>";
+        return;
+      }
+
+      data.forEach(book => {
+        const div = document.createElement("div");
+
+        div.innerHTML = `
+          <p>
+            <strong>${book.title}</strong> - ${book.author}
+          </p>
+          ${book.cover_url ? `<img src="${book.cover_url}" width="80">` : ""}
+        `;
+
+        libraryDiv.appendChild(div);
+      });
+    }
+
+    // 🔘 Bouton recherche
+    document.getElementById("searchBtn").addEventListener("click", searchBooks);
+
+    // 🚀 Chargement initial
+    loadLibrary();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <title>Bibliothèque de Tsuyu</title>
+</head>
+<body>
+  <h1>📚 Bibliothèque de la Sorcière Tsuyu</h1>
+
+  <input type="text" id="search" placeholder="Rechercher un livre..." />
+  <button id="searchBtn">🔍 Chercher</button>
+
+  <h2>🔎 Résultats</h2>
+  <div id="results"></div>
+
+  <h2>📚 Ma bibliothèque</h2>
+  <div id="library"></div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
     // ✅ Connexion Supabase (corrigée)
     const supabaseClient = window.supabase.createClient(
       "https://kmdkhpaxqnmyuapicycq.supabase.co",
