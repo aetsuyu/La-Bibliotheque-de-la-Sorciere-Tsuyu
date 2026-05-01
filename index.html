@@ -63,11 +63,14 @@
         button.onclick = () => addBook(info);
 
         div.innerHTML = `
-          <p>
-            <strong>${info.title}</strong> - ${info.authors[0]}
-          </p>
-          ${info.imageLinks.thumbnail ? `<img src="${info.imageLinks.thumbnail}" width="80">` : ""}
-        `;
+  <div style="display:flex; gap:10px; margin-bottom:10px;">
+    ${info.imageLinks.thumbnail ? `<img src="${info.imageLinks.thumbnail}" width="60">` : ""}
+    <div>
+      <strong>${info.title}</strong><br>
+      ${info.authors[0]}
+    </div>
+  </div>
+`;
 
         div.appendChild(button);
         resultsDiv.appendChild(div);
@@ -111,11 +114,14 @@
         const div = document.createElement("div");
 
         div.innerHTML = `
-          <p>
-            <strong>${book.title}</strong> - ${book.author}
-          </p>
-          ${book.cover_url ? `<img src="${book.cover_url}" width="80">` : ""}
-        `;
+  <div style="display:flex; gap:10px; margin-bottom:10px;">
+    ${book.cover_url ? `<img src="${book.cover_url}" width="60">` : ""}
+    <div>
+      <strong>${book.title}</strong><br>
+      ${book.author}
+    </div>
+  </div>
+`;
 
         libraryDiv.appendChild(div);
       });
