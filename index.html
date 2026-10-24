@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr" data-theme="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bibliothèque de la Sorcière Tsuyu</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EDEE; --surface:#F6F8F8; --ink:#17232E; --muted:#5B6B77; --line:#C6D0D4; --accent:#1E6B66; --accent-ink:#fff; --danger:#A8362F;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif; --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12191F; --surface:#1B252D; --ink:#E7EDEF; --muted:#93A3AD; --line:#2D3B45; --accent:#5CC0B8; --accent-ink:#0B1A19; --danger:#F08A82; color-scheme:dark;}}
+:root[data-theme="dark"]{--bg:#12191F; --surface:#1B252D; --ink:#E7EDEF; --muted:#93A3AD; --line:#2D3B45; --accent:#5CC0B8; --accent-ink:#0B1A19; --danger:#F08A82; color-scheme:dark;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans)}
+main{max-width:1100px;margin:0 auto;padding:28px 20px 64px}
+h1{font:600 clamp(2rem,5vw,3rem)/1.05 var(--serif);margin:0 0 4px;letter-spacing:-.01em}
+.count{color:var(--muted);margin:0 0 24px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:10px 14px;font:500 1rem var(--sans);color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:26px}
+.bar label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:3px}
+.bar .grow{flex:1 1 180px}
+input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-height:40px;width:100%}
+.btn{font:600 .95rem var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:0 16px;min-height:40px;cursor:pointer}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--danger);border:1px solid var(--danger)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:28px 20px}
+.book{all:unset;display:block;cursor:pointer;border-radius:4px}
+.book:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.cover{position:relative;aspect-ratio:2/3;border-radius:2px 5px 5px 2px;overflow:hidden;box-shadow:inset 3px 0 0 rgba(0,0,0,.18),0 1px 0 var(--line),0 8px 14px -8px rgba(0,0,0,.35)}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.ph{width:100%;height:100%;display:flex;align-items:flex-end;padding:12px 10px 14px 14px;font:600 1.05rem/1.15 var(--serif);color:#fff}
+.lang{position:absolute;top:6px;right:6px;background:rgba(10,20,26,.75);color:#fff;font:600 .7rem var(--sans);padding:2px 6px;border-radius:3px}
+.t{font:600 1rem/1.25 var(--serif);margin:10px 0 2px}
+.a{font-size:.88rem;color:var(--muted)}
+.empty{grid-column:1/-1;padding:48px 0;color:var(--muted);text-align:center}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:22px;width:min(440px,calc(100vw - 24px))}
+dialog::backdrop{background:rgba(5,12,16,.55)}
+dialog h2{font:600 1.5rem var(--serif);margin:0 0 14px}
+.f{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.pv{width:72px;aspect-ratio:2/3;object-fit:cover;border-radius:3px;border:1px solid var(--line);display:none}
+.pv.on{display:block}
+.cv{display:flex;gap:12px;align-items:center}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.acts .sp{margin-right:auto}
+.note{font-size:.8rem;color:var(--muted);margin-top:30px}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+details summary{cursor:pointer;color:var(--muted);font-size:.85rem}
+input:disabled,select:disabled{color:var(--ink);opacity:1}
+.lookbox{display:grid;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.lookbox[hidden]{display:none}
+.lookbox .r{display:flex;gap:8px;align-items:end}
+.lookbox label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.hit{all:unset;display:flex;gap:10px;align-items:center;cursor:pointer;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:.92rem;font-weight:600}
+.hit small{display:block;font-weight:400;color:var(--muted)}
+.hit img{width:34px;aspect-ratio:2/3;object-fit:cover;border-radius:2px;flex:none}
+.hit:hover{border-color:var(--accent)}
+.hit:focus-visible{outline:3px solid var(--accent)}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.ro .edit{display:none!important}
+</style>
+</head>
+<body class="ro">
+<main>
+  <h1>Bibliothèque de la Sorcière Tsuyu</h1>
+  <p class="count" id="count" aria-live="polite"></p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-type="roman" aria-selected="true">Romans</button>
+    <button class="tab" role="tab" data-type="bd" aria-selected="false">BD et mangas</button>
+  </div>
+
+  <div class="bar">
+    <label class="grow">Rechercher<input id="q" type="search" placeholder="Titre ou auteur·ice"></label>
+    <label>Classer par
+      <select id="sort">
+        <option value="title">Titre</option>
+        <option value="author">Auteur·ice</option>
+        <option value="lang">Langue</option>
+      </select>
+    </label>
+    <label>Langue
+      <select id="filter">
+        <option value="">Toutes</option>
+        <option value="fr">Français</option>
+        <option value="en">Anglais</option>
+      </select>
+    </label>
+    <button class="btn edit" id="add">Ajouter un livre</button>
+    
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <p class="note"><button class="btn ghost" id="owner">Mode propriétaire</button> <span id="status" aria-live="polite"></span></p>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" id="form" class="f" autocomplete="off">
+    <h2 id="dtitle">Ajouter un livre</h2>
+    <div class="lookbox" id="lookbox" hidden>
+      <div class="r"><label>Rechercher un livre<input id="q-look" type="search" placeholder="Titre, auteur·ice ou ISBN"></label><button type="button" class="btn" id="look">Chercher</button></div>
+      <div class="f" id="hits" aria-live="polite"></div>
+      <p class="hint">Résultats d’Open Library et de Google Livres : vérifiez-les avant d’enregistrer.</p>
+    </div>
+    <fieldset id="fs" class="f">
+    <label>Titre<input id="f-title" required></label>
+    <div class="row">
+      <label>Prénom<input id="f-first"></label>
+      <label>Nom<input id="f-last" required></label>
+    </div>
+    <div class="row">
+      <label>Langue
+        <select id="f-lang"><option value="fr">Français</option><option value="en">Anglais</option></select>
+      </label>
+      <label>Catégorie
+        <select id="f-type"><option value="roman">Roman</option><option value="bd">BD ou manga</option></select>
+      </label>
+    </div>
+    <details id="more"><summary>Plus d’informations</summary><div class="f" style="margin-top:10px"><div class="row"><label>Série ou tome<input id="f-series"></label><label>Éditeur<input id="f-pub"></label></div><div class="row"><label>Année<input id="f-year" inputmode="numeric"></label><label>ISBN<input id="f-isbn"></label></div></div></details>
+    <div class="cv">
+      <img class="pv" id="pv" alt="Aperçu de la couverture">
+      <label style="flex:1">Adresse de l’image de couverture<input id="f-cover" type="url" placeholder="https://…"></label>
+    </div>
+    </fieldset>
+    <div class="acts">
+      <button type="button" class="btn danger sp" id="del" hidden>Supprimer</button>
+      <button type="button" class="btn ghost" id="cancel">Annuler</button>
+      <button type="submit" class="btn" id="save">Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var OWNER="aetsuyu", REPO="La-Bibliotheque-de-la-Sorciere-Tsuyu", FILE="books.json";
+  var API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+FILE;
+  var $=function(i){return document.getElementById(i)};
+  var books=[], tab="roman", editing=null, sha=null, token="", owner=false, LANG={fr:"FR",en:"EN"};
+  try{token=localStorage.getItem("gh")||""}catch(e){}
+
+  function norm(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+  function cmp(a,b){return (a||"").localeCompare(b||"","fr",{sensitivity:"base",numeric:true})}
+  function authorName(b){return ((b.first||"")+" "+(b.last||"")).trim()}
+  function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
+  function ph(b){var p=document.createElement("div");p.className="ph";p.style.background="hsl("+hue(b.title)+" 38% 32%)";p.textContent=b.title;return p}
+
+  function view(){
+    var q=norm($("q").value), f=$("filter").value, s=$("sort").value;
+    var list=books.filter(function(b){return b.type===tab&&(!f||b.lang===f)&&(!q||norm(b.title+" "+authorName(b)).indexOf(q)>-1)});
+    list.sort(function(a,b){
+      if(s==="author")return cmp(a.last,b.last)||cmp(a.first,b.first)||cmp(a.title,b.title);
+      if(s==="lang")return cmp(a.lang,b.lang)||cmp(a.title,b.title);
+      return cmp(a.title,b.title);
+    });
+    var g=$("grid"); g.textContent="";
+    if(!list.length){
+      var e=document.createElement("p");e.className="empty";
+      e.textContent=books.some(function(b){return b.type===tab})?"Aucun livre ne correspond à cette recherche.":owner?"Cet onglet est vide. Ajoutez votre premier livre.":"Cet onglet est vide pour le moment.";
+      g.appendChild(e);
+    }
+    list.forEach(function(b){
+      var el=document.createElement("button");el.className="book";el.type="button";
+      var c=document.createElement("div");c.className="cover";
+      if(b.cover){var im=document.createElement("img");im.alt="Couverture de "+b.title;im.loading="lazy";im.referrerPolicy="no-referrer";im.onerror=function(){c.replaceChild(ph(b),im)};im.src=b.cover;c.appendChild(im)}else c.appendChild(ph(b));
+      var l=document.createElement("span");l.className="lang";l.textContent=LANG[b.lang]||"";c.appendChild(l);
+      var t=document.createElement("div");t.className="t";t.textContent=b.title;
+      var a=document.createElement("div");a.className="a";a.textContent=authorName(b);
+      el.appendChild(c);el.appendChild(t);el.appendChild(a);
+      el.addEventListener("click",function(){openForm(b)});
+      g.appendChild(el);
+    });
+    var n=books.filter(function(b){return b.type===tab}).length;
+    $("count").textContent=books.length+(books.length>1?" livres":" livre")+" au total · "+n+(tab==="roman"?" roman"+(n>1?"s":""):" BD ou manga"+(n>1?"s":""));
+  }
+
+  /* Lecture et écriture de books.json dans le dépôt GitHub */
+  function hdr(){return {Accept:"application/vnd.github+json",Authorization:"Bearer "+token}}
+  function b64(s){return btoa(unescape(encodeURIComponent(s)))}
+  function unb64(s){return decodeURIComponent(escape(atob(s.replace(/\s/g,""))))}
+  async function loadPublic(){
+    var r=await fetch(FILE+"?t="+Date.now()); books=r.ok?await r.json():[];
+  }
+  async function loadOwner(){
+    var r=await fetch(API,{headers:hdr(),cache:"no-store"});
+    if(r.status===404){books=[];sha=null;return}
+    if(!r.ok)throw new Error(r.status);
+    var j=await r.json(); sha=j.sha; books=JSON.parse(unb64(j.content)||"[]");
+  }
+  async function save(msg){
+    var body={message:msg,content:b64(JSON.stringify(books,null,1)+"\n")}; if(sha)body.sha=sha;
+    var r=await fetch(API,{method:"PUT",headers:Object.assign({"Content-Type":"application/json"},hdr()),body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(r.status);
+    sha=(await r.json()).content.sha;
+    $("status").textContent="Enregistré. Les visiteurs verront le changement d’ici une minute environ.";
+  }
+  async function commit(next,msg){
+    var prev=books; books=next;
+    try{await save(msg);return true}
+    catch(e){try{await loadOwner()}catch(x){books=prev} alert("Enregistrement impossible. Réessayez.");return false}
+    finally{view()}
+  }
+
+  function setOwner(on){
+    owner=on; document.body.classList.toggle("ro",!on);
+    $("owner").textContent=on?"Quitter le mode propriétaire":"Mode propriétaire";
+  }
+  $("owner").addEventListener("click",async function(){
+    if(owner){token="";try{localStorage.removeItem("gh")}catch(e){} setOwner(false);$("status").textContent="";try{await loadPublic()}catch(e){} view();return}
+    var t=prompt("Collez votre jeton d’accès GitHub (il reste uniquement dans ce navigateur) :"); if(!t)return;
+    token=t.trim();
+    try{await loadOwner();try{localStorage.setItem("gh",token)}catch(e){} setOwner(true);view()}
+    catch(e){token="";alert("Jeton refusé, expiré ou sans accès à ce dépôt.")}
+  });
+
+  /* Formulaire */
+  function setPv(src){var p=$("pv");if(src){p.src=src;p.classList.add("on")}else{p.removeAttribute("src");p.classList.remove("on")}}
+  function openForm(b){
+    if(!owner&&!b)return;
+    var ro=!owner; editing=b||null;
+    $("dtitle").textContent=ro?"Détails du livre":b?"Modifier le livre":"Ajouter un livre";
+    $("fs").disabled=ro; $("save").hidden=ro; $("cancel").textContent=ro?"Fermer":"Annuler";
+    $("lookbox").hidden=ro||!!b; $("hits").textContent=""; $("q-look").value="";
+    $("f-title").value=b?b.title:""; $("f-first").value=b?b.first||"":""; $("f-last").value=b?b.last||"":"";
+    $("f-lang").value=b?b.lang:"fr"; $("f-type").value=b?b.type:tab;
+    $("f-series").value=b?b.series||"":""; $("f-pub").value=b?b.publisher||"":""; $("f-year").value=b?b.year||"":""; $("f-isbn").value=b?b.isbn||"":"";
+    $("f-cover").value=b?b.cover||"":""; setPv($("f-cover").value);
+    $("more").open=!!(b&&(b.series||b.publisher||b.year||b.isbn));
+    $("del").hidden=ro||!b; $("dlg").showModal(); if(!ro)(b?$("f-title"):$("q-look")).focus();
+  }
+  $("f-cover").addEventListener("change",function(){setPv($("f-cover").value.trim())});
+  $("form").addEventListener("submit",async function(ev){
+    ev.preventDefault(); if(!owner)return;
+    var d={id:editing?editing.id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:$("f-title").value.trim(),first:$("f-first").value.trim(),last:$("f-last").value.trim(),lang:$("f-lang").value,type:$("f-type").value,cover:$("f-cover").value.trim(),series:$("f-series").value.trim(),publisher:$("f-pub").value.trim(),year:$("f-year").value.trim(),isbn:$("f-isbn").value.trim()};
+    $("save").disabled=true;
+    var next=editing?books.map(function(x){return x.id===d.id?d:x}):books.concat([d]);
+    if(await commit(next,(editing?"Modifier : ":"Ajouter : ")+d.title)){tab=d.type;syncTabs();$("dlg").close()}
+    $("save").disabled=false;
+  });
+  $("cancel").addEventListener("click",function(){$("dlg").close()});
+  $("del").addEventListener("click",async function(){
+    if(!editing||!confirm("Supprimer « "+editing.title+" » ?"))return;
+    var id=editing.id,t=editing.title;
+    if(await commit(books.filter(function(x){return x.id!==id}),"Supprimer : "+t))$("dlg").close();
+  });
+  $("add").addEventListener("click",function(){openForm(null)});
+
+  /* Recherche en ligne : Open Library et Google Livres */
+  function splitName(n){n=(n||"").trim();var i=n.lastIndexOf(" ");return i<0?["",n]:[n.slice(0,i),n.slice(i+1)]}
+  var isIsbn=function(q){return /^[\d\- xX]{10,17}$/.test(q)};
+  async function olSearch(q){
+    var u="https://openlibrary.org/search.json?limit=6&fields=title,author_name,first_publish_year,language,isbn,cover_i,publisher&"+(isIsbn(q)?"isbn="+q.replace(/[\s-]/g,""):"q="+encodeURIComponent(q));
+    var j=await (await fetch(u)).json();
+    return (j.docs||[]).map(function(d){
+      var a=splitName((d.author_name||[""])[0]), l=d.language||[];
+      return {title:d.title,first:a[0],last:a[1],lang:l.some(function(c){return c==="fre"||c==="fra"})?"fr":l.indexOf("eng")>-1?"en":"fr",publisher:(d.publisher||[""])[0],year:d.first_publish_year||"",isbn:(d.isbn||[""])[0],cover:d.cover_i?"https://covers.openlibrary.org/b/id/"+d.cover_i+"-M.jpg":""};
+    });
+  }
+  async function gbSearch(q){
+    var u="https://www.googleapis.com/books/v1/volumes?maxResults=6&q="+encodeURIComponent(isIsbn(q)?"isbn:"+q.replace(/[\s-]/g,""):q);
+    var j=await (await fetch(u)).json();
+    return (j.items||[]).map(function(it){
+      var v=it.volumeInfo||{}, a=splitName((v.authors||[""])[0]), ids=v.industryIdentifiers||[], img=(v.imageLinks||{}).thumbnail||"";
+      return {title:(v.title||"")+(v.subtitle?" : "+v.subtitle:""),first:a[0],last:a[1],lang:v.language==="en"?"en":"fr",type:/comic|graphic|manga/i.test((v.categories||[]).join(" "))?"bd":"",publisher:v.publisher||"",year:(v.publishedDate||"").slice(0,4),isbn:(ids[0]||{}).identifier||"",cover:img.replace(/^http:/,"https:").replace("&edge=curl","")};
+    });
+  }
+  function fill(x){
+    $("f-title").value=x.title||"";$("f-first").value=x.first||"";$("f-last").value=x.last||"";
+    $("f-lang").value=x.lang==="en"?"en":"fr";$("f-type").value=x.type||tab;
+    $("f-series").value="";$("f-pub").value=x.publisher||"";$("f-year").value=x.year||"";$("f-isbn").value=x.isbn||"";
+    $("f-cover").value=x.cover||"";setPv(x.cover||"");$("more").open=true;$("hits").textContent="";
+  }
+  async function lookup(){
+    var q=$("q-look").value.trim(),h=$("hits"); if(!q)return;
+    h.textContent="Recherche en cours…";
+    var r=await Promise.allSettled([olSearch(q),gbSearch(q)]), all=[];
+    r.forEach(function(x){if(x.status==="fulfilled")all=all.concat(x.value)});
+    all=all.filter(function(x){return x.title});
+    all=all.filter(function(x){return x.cover}).concat(all.filter(function(x){return !x.cover})).slice(0,8);
+    h.textContent=all.length?"":"Aucun résultat. Essayez avec l’ISBN ou saisissez le livre à la main.";
+    all.forEach(function(x){
+      var el=document.createElement("button");el.type="button";el.className="hit";
+      if(x.cover){var im=document.createElement("img");im.alt="";im.referrerPolicy="no-referrer";im.src=x.cover;el.appendChild(im)}
+      var w=document.createElement("span");w.textContent=x.title;var sm=document.createElement("small");
+      sm.textContent=[authorName(x),x.publisher,x.year].filter(Boolean).join(", ");w.appendChild(sm);el.appendChild(w);
+      el.addEventListener("click",function(){fill(x)});h.appendChild(el);
+    });
+  }
+  $("look").addEventListener("click",lookup);
+  $("q-look").addEventListener("keydown",function(ev){if(ev.key==="Enter"){ev.preventDefault();lookup()}});
+
+  ["q","sort","filter"].forEach(function(id){$(id).addEventListener("input",view)});
+  function syncTabs(){document.querySelectorAll(".tab").forEach(function(t){t.setAttribute("aria-selected",String(t.dataset.type===tab))})}
+  document.querySelectorAll(".tab").forEach(function(t){t.addEventListener("click",function(){tab=t.dataset.type;syncTabs();view()})});
+
+  (async function init(){
+    try{
+      if(token){await loadOwner();setOwner(true)}else await loadPublic();
+    }catch(e){
+      if(token){token="";try{localStorage.removeItem("gh")}catch(x){} $("status").textContent="Jeton refusé ou expiré : reconnectez-vous."}
+      try{await loadPublic()}catch(x){}
+    }
+    view();
+  })();
+})();
+</script>
+</body>
+</html>
